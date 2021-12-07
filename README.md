@@ -1,4 +1,7 @@
 # Advent of Code 2021
-*Python 3 Based Solutions for the Advent of Code, 2021*
 
-Files are seperated by day, and I've uploaded my own inputs for my own sake.
+*My solutions to the 2021 Advent of Code in Python 3*
+
+## Try It Out for yourself!
+
+[Here's](https://adventofcode.com/) a link so you can have a go at completing the challenges your own way.
