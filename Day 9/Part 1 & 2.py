@@ -1,37 +1,50 @@
-from collections import Counter
+import sys
+import itertools
+from collections import defaultdict, Counter, deque
 
-with open("input.txt") as f:
-    data = [list(map(int, line[:-1])) for line in f.readlines()]
+infile = sys.argv[1] if len(sys.argv)>1 else 'input.txt'
+G = []
+for line in open(infile):
+    G.append([int(x) for x in list(line.strip())])
+R = len(G)
+C = len(G[0])
+DR = [-1,0,1,0]
+DC = [0,1,0,-1]
+ans = 0
+for r in range(R):
+    assert len(G[r])==C
+    for c in range(C):
+        ok = True
+        for d in range(4):
+            rr = r+DR[d]
+            cc = c+DC[d]
+            if 0<=rr<R and 0<=cc<C and G[rr][cc]<=G[r][c]:
+                ok = False
+        if ok:
+            ans += G[r][c]+1
+print(ans)
 
-part_1 = 0
-basin = 0
-seen = {}
-stack = []
-for r in range(len(data)):
-    for c in range(len(data[0])):
-        if all(
-            r + dr < 0
-            or r + dr >= len(data)
-            or c + dc < 0
-            or c + dc >= len(data[0])
-            or data[r][c] < data[r + dr][c + dc]
-            for dr, dc in ((0, -1), (0, 1), (-1, 0), (1, 0))
-        ):
-            part_1 += 1 + data[r][c]
+S = []
+SEEN = set()
+for r in range(R):
+    for c in range(C):
+        if (r,c) not in SEEN and G[r][c]!=9:
+            size = 0
+            Q = deque()
+            Q.append((r,c))
+            while Q:
+                (r,c) = Q.popleft()
+                if (r,c) in SEEN:
+                    continue
+                SEEN.add((r,c))
+                size += 1
+                for d in range(4):
+                    rr = r+DR[d]
+                    cc = c+DC[d]
+                    if 0<=rr<R and 0<=cc<C and G[rr][cc]!=9:
+                        Q.append((rr,cc))
+            S.append(size)
+S.sort()
+print(S[-1]*S[-2]*S[-3])
 
-        if (r, c) not in seen and data[r][c] != 9:
-            stack.append((r, c))
-            while stack:
-                r, c = stack.pop()
-                for dr, dc in ((0, -1), (0, 1), (-1, 0), (1, 0)):
-                    r_ = r + dr
-                    c_ = c + dc
-                    if 0 <= r_ < len(data) and 0 <= c_ < len(data[0]):
-                        if (r_, c_) not in seen and data[r_][c_] != 9:
-                            seen[(r_, c_)] = basin
-                            stack.append((r_, c_))
-            basin += 1
 
-print(part_1)
-a, b, c = Counter(list(seen.values())).most_common(3)
-print(a[1] * b[1] * c[1])
